@@ -1,0 +1,41 @@
+#!perl
+
+# DATE
+# VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+require Perinci::CmdLine::Any;
+
+my $prefix = "/App/CPAN/Changes/";
+Perinci::CmdLine::Any->new(
+    url => $prefix,
+    subcommands => {
+        check    => { url => "${prefix}check" },
+        dump     => { url => "${prefix}dump" },
+        preamble => { url => "${prefix}preamble" },
+    },
+)->run;
+
+# ABSTRACT: CLI for CPAN::Changes
+
+=head1 SYNOPSIS
+
+Check syntax:
+
+ % cpan-changes check -f Changes
+ % cpan-changes check ;# by default try to search file Changes, CHANGELOG, etc
+
+Parse and dump parse result as JSON structure:
+
+ % cpan-changes dump
+
+Get preamble of Changes:
+
+ % cpan-changes preamble
+
+Set new preamble of Changes:
+
+ % cpan-changes preamble Changes ""
