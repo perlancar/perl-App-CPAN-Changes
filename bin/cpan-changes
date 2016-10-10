@@ -12,6 +12,7 @@ require Perinci::CmdLine::Lite;
 my $prefix = "/App/CPAN/Changes/";
 Perinci::CmdLine::Lite->new(
     url => $prefix,
+    summary => 'CLI for CPAN::Changes',
     subcommands => {
         check           => { url => "${prefix}check" },
         dump            => { url => "${prefix}dump" },
@@ -21,7 +22,7 @@ Perinci::CmdLine::Lite->new(
     },
 )->run;
 
-# ABSTRACT: CLI for CPAN::Changes
+# ABSTRACT:
 # PODNAME:
 
 =head1 SYNOPSIS

@@ -14,7 +14,7 @@ our %SPEC;
 
 $SPEC{':package'} = {
     v => 1.1,
-    summary => 'Routines to read/modify Changes using CPAN::Changes',
+    summary => 'CLI for CPAN::Changes',
 };
 
 sub _parse {
