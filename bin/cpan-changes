@@ -7,10 +7,10 @@ use 5.010001;
 use strict;
 use warnings;
 
-require Perinci::CmdLine::Any;
+require Perinci::CmdLine::Lite;
 
 my $prefix = "/App/CPAN/Changes/";
-Perinci::CmdLine::Any->new(
+Perinci::CmdLine::Lite->new(
     url => $prefix,
     subcommands => {
         check           => { url => "${prefix}check" },
@@ -22,6 +22,7 @@ Perinci::CmdLine::Any->new(
 )->run;
 
 # ABSTRACT: CLI for CPAN::Changes
+# PODNAME:
 
 =head1 SYNOPSIS
 
