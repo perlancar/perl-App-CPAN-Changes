@@ -13,9 +13,11 @@ my $prefix = "/App/CPAN/Changes/";
 Perinci::CmdLine::Any->new(
     url => $prefix,
     subcommands => {
-        check    => { url => "${prefix}check" },
-        dump     => { url => "${prefix}dump" },
-        preamble => { url => "${prefix}preamble" },
+        check           => { url => "${prefix}check" },
+        dump            => { url => "${prefix}dump" },
+        preamble        => { url => "${prefix}preamble" },
+        release         => { url => "${prefix}release" },
+        'add-release'   => { url => "${prefix}add_release" },
     },
 )->run;
 
@@ -32,10 +34,31 @@ Parse and dump parse result as JSON structure:
 
  % cpan-changes dump
 
-Get preamble of Changes:
+Get preamble:
 
  % cpan-changes preamble
 
-Set new preamble of Changes:
+Set new preamble:
 
- % cpan-changes preamble Changes ""
+ % cpan-changes preamble "Revision history of Foo-Bar"
+
+See information about a particular release:
+
+ % cpan-changes release 0.001
+
+Add a new release:
+
+ % cpan-changes add-release 0.002 2016-10-10 "Change 1" "[GROUP 1]" "Change 2"
+
+ # ditto, but dry-run and will show the resulting Changes file
+ % cpan-changes add-release -V 0.002 --date 2016-10-10 --change "Change 1" \
+     --change "[GROUP 1]" --change "Change 2" --dry-run
+
+More subcommands to be added.
+
+
+=head1 SEE ALSO
+
+L<CPAN::Changes>
+
+L<changes> from L<Module::Changes>

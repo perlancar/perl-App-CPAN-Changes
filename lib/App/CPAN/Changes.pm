@@ -8,8 +8,14 @@ use strict;
 use warnings;
 
 use Fcntl qw(:DEFAULT);
+use POSIX qw(strftime);
 
 our %SPEC;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Routines to read/modify Changes using CPAN::Changes',
+};
 
 sub _parse {
     my ($file) = @_;
@@ -33,6 +39,7 @@ my %common_args = (
         summary => 'If not specified, will look for file called '.
             'Changes/CHANGELOG/etc in current directory',
         cmdline_aliases => {f=>{}},
+        tags => ['common'],
     },
 );
 
@@ -65,8 +72,13 @@ sub dump {
 
     my ($file, $ch) = _parse($args{file});
 
-    require Data::Clean::JSON;
-    [200, "OK", Data::Clean::JSON->get_cleanser->clone_and_clean($ch)];
+    [200, "OK", $ch];
+}
+
+sub _serialize {
+    my ($ch, $reverse) = @_;
+
+    $ch->serialize(reverse => $reverse);
 }
 
 sub _write {
@@ -75,14 +87,17 @@ sub _write {
     my $tempfile = sprintf("%s.%05d.tmp", $file, rand()*65536);
     sysopen my($fh), $tempfile, O_WRONLY|O_CREAT|O_EXCL
         or die "Can't open temp file '$tempfile': $!";
-    print $fh $ch->serialize(reverse => $reverse);
+    print $fh _serialize($ch, $reverse);
+    rename $file, "$file.bak"
+        or die "Can't move '$file' to '$file.bak': $!";
     rename $tempfile, $file
-        or die "Can't replace '$file': $!";
+        or die "Can't move '$tempfile' to '$file': $!";
 }
 
 $SPEC{preamble} = {
     v => 1.1,
     summary => 'Get/set preamble',
+    tags => ['write'],
     args => {
         %common_args,
         preamble => {
@@ -103,6 +118,94 @@ sub preamble {
         [200, "OK"];
     } else {
         [200, "OK", $ch->preamble];
+    }
+}
+
+$SPEC{release} = {
+    v => 1.1,
+    summary => 'Return information (JSON object dump) of a specific release',
+    args => {
+        %common_args,
+        version => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+    },
+};
+sub release {
+    my %args = @_;
+
+    my ($file, $ch) = _parse($args{file});
+
+    my $rel = $ch->release($args{version});
+
+    [200, "OK", $rel];
+}
+
+$SPEC{add_release} = {
+    v => 1.1,
+    summary => 'Add a new release',
+    tags => ['write'],
+    args => {
+        %common_args,
+        version => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+            cmdline_aliases => {V=>{}},
+        },
+        date => {
+            schema => 'date*',
+            req => 1,
+            pos => 1,
+        },
+        changes => {
+            'x.name.is_plural' => 1,
+            schema => ['array*', of=>'str*', min_len=>1],
+            req => 1,
+            pos => 2,
+            greedy => 1,
+        },
+        note => {
+            schema => 'str*',
+        },
+    },
+    features => {
+        dry_run => 1,
+    },
+};
+sub add_release {
+    my %args = @_;
+
+    my ($file, $ch) = _parse($args{file});
+
+    # format to YYYY-MM-DD
+    my $date = strftime("%Y-%m-%d",
+                        localtime $args{date});
+
+    my $rel = CPAN::Changes::Release->new(
+        version => $args{version},
+        date    => $date,
+    );
+    $rel->note($args{note}) if $args{note};
+    my @c;
+    for my $c (@{ $args{changes} }) {
+        if ($c =~ /\A\[(.+)\]\z/) {
+            push @c, {group => $1};
+        } else {
+            push @c, $c;
+        }
+    }
+    $rel->add_changes(@c);
+
+    $ch->add_release($rel);
+
+    if ($args{-dry_run}) {
+        return [304, "Not modified", _serialize($ch)];
+    } else {
+        _write($file, $ch);
+        return [200, "OK"];
     }
 }
 
