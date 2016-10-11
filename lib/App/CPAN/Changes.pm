@@ -25,8 +25,8 @@ sub _parse {
 	    do { $file = $_; last } if -f $_;
 	}
     }
-    return [400, "Please specify file ".
-                "(or run in directory where Changes file exists)"]
+    die "Please specify file ".
+        "(or run in directory where Changes file exists)"
         unless $file;
 
     require CPAN::Changes;
