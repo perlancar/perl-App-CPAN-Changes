@@ -1,5 +1,3 @@
-Revision history for App-CPAN-Changes
-
 0.002   2016-10-11 (PERLANCAR)
 
 	- [Bugfix] Die instead of return error response in _parse() to keep
