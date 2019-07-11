@@ -1,11 +1,11 @@
-0.003   2017-07-14 (PERLANCAR)
+0.003   2017-07-14  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild without depak (end of testing).
 
 
-0.002   2016-10-11 (PERLANCAR)
+0.002   2016-10-11  Released-By: PERLANCAR
 
 	- [Bugfix] Die instead of return error response in _parse() to keep
 	  code simple.
@@ -13,6 +13,6 @@
 	- Tweak Abstract.
 
 
-0.001   2016-10-10 (PERLANCAR) (unreleased)
+0.001   2016-10-10 (PERLANCAR)  Released-By: unreleased
 
         - First early release.
